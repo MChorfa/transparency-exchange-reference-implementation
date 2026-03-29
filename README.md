@@ -6,66 +6,69 @@
 [![ECMA TC54](https://img.shields.io/badge/ECMA-TC54-FC7C00?labelColor=404040)](https://tc54.org)
 [![ECMA TC54](https://img.shields.io/badge/ECMA-TC54--TG1-FC7C00?labelColor=404040)](https://ecma-international.org/task-groups/tc54-tg1/)
 
-# OWASP Transparency Exchange API Standard
+# CycloneDX Transparency Exchange API Reference Implementation
 
-The Transparency Exchange API (TEA) is being worked on within the ECMA TC54 tg 1
-with the goal to standardise the API in ECMA. 
-The working group has a slack channel in the CycloneDX slack space.
+This repository contains the implementation code, supporting tooling, and
+operational documentation for the CycloneDX Transparency Exchange API (TEA).
+It is the home of the Rust server runtime in `tea-server/`, the Dagger
+pipeline, local validation and generation tooling, and implementation-focused
+documentation.
+
+The normative TEA specification continues to live in the upstream specification
+repository:
+
+- https://github.com/CycloneDX/transparency-exchange-api
+
+If you want to change the standard itself, open that change upstream. If you
+want runnable code, deployment assets, validation tooling, or implementation
+hardening, this repository is the right place.
 
 ![Transparency Exchange API Logo](images/tealogo.png "Transparency Exchange API Logo")
 
-## Status of the standard: Beta 2
+## Repository Scope
 
-TEA is now in beta 2. This beta focuses on ready-to-implement consumer side of the API. Work on the
-publisher API will start after the 1.0 release.
+- `tea-server/`: Rust HTTP and gRPC reference server
+- `dagger/`: build, conformance, and release automation
+- `tools/`: validation and document-generation helpers used by the implementation
+- `proto/` and `schemas/`: implementation-tracked TEA contracts consumed by the runtime and tooling
+- `docs/` and `doc/`: architecture, evidence, integration, and implementation notes
 
-We encourage developers to start with both client and server implementations of TEA and
-participate in interoperability tests. These will be organised both as hackathons and
-informally using the Slack channel.
+## Status of This Repository
 
+- Focus: executable reference implementation and integration tooling
+- Consumer APIs: actively implemented
+- Publisher APIs: partial and evolving
+- Specification authority: upstream repository and the ECMA TC54 working process
 
-Priority issues for v1.0:
+## Relationship to the Specification
 
-- E2e poc of authn/z workflow with TEA consumer spec, including consumer spec adjustment to better support authn/z
-- Compliance document workflow, see https://github.com/CycloneDX/transparency-exchange-api/issues/205
+The upstream TEA specification repository remains the canonical place for:
 
-Check the list of [implementations](doc/tea-implementations.md) that are available.
+- normative contract changes
+- standard-language documentation
+- schema and protocol review intended for standardization
 
-## Introduction
+This implementation repository tracks and exercises those contracts in code.
+When spec and implementation changes need to move separately, the spec-facing
+subset is proposed upstream and the implementation-specific work stays here.
 
-The TEA API is created to support automation of the software supply chain. Upstream
-vendors and open source projects can use this standard to keep downstream consumers
-up to date with transparency artefacts such as, but not limited to, bill of materials,
-VEX files, attestations and much more.
+## Key References
 
-This specification defines a standard, format agnostic, API for the exchange of
-product related artefacts, like BOMs, between systems. The work includes:
+- [Upstream specification repository](https://github.com/CycloneDX/transparency-exchange-api)
+- [Discovery overview](discovery/readme.md)
+- [Authentication and authorization overview](auth/readme.md)
+- [TEA Product Release](tea-product/tea-product-release.md)
+- [TEA Component](tea-component/tea-component.md)
+- [TEA Collection](tea-collection/tea-collection.md)
+- [TEA Server](tea-server/README.md)
 
-- [Discovery of servers](/discovery/readme.md): Describes discovery using the Transparency Exchange Identifier (TEI)
-- Retrieval of artefacts
-- Publication of artefacts
-- [Authentication and authorization](/auth/readme.md)
-- Querying
+## Implementation Highlights
 
-System and tooling implementors are encouraged to adopt this API standard for
-sending/receiving transparency artefacts between systems. 
-This will enable more widespread
-"out of the box" integration support in the BOM ecosystem.
-
-## Use cases and requirements
-
-The working group has produced a list of use cases and requirements for the protocol.
-
-- [TEA requirements](doc/tea-requirements.md)
-- [TEA use cases](doc/tea-usecases.md)
-
-## Data model
-- [TEA Product Release](tea-product/tea-product-release.md): The primary entry point. The [Transparency Exchange Identifier, TEI](/discovery/readme.md) resolves to a specific Product Release. A Product Release may optionally belong to a [TEA Product](tea-product/tea-product.md).
-- [TEA Product](tea-product/tea-product.md): An optional higher-level object that groups a set of Product Releases for a product line or family. Products can be discovered and browsed; releases are accessed via `/product/{uuid}/releases`.
-- [TEA Component](tea-component/tea-component.md): Represents a component lineage. A Component is a collection of Component Releases (accessible via `/component/{uuid}/releases`).
-- [TEA Release](/tea-component/tea-release.md): A Component Release object. Each Component Release may have its own TEA Collection.
-- [TEA Collection](tea-collection/tea-collection.md): A versioned list of artefacts for a specific Release (Component Release) or Product Release. Collections are versioned to indicate changes, e.g., an updated VEX or corrected SBOM.
-- [TEA Artifacts](tea-artifact/tea-artifact.md): Files associated with a Collection. A single TEA Artifact can appear in multiple Collections. Note that a TEA Artifact is a named term introduced by the TEA standard.
+- Rust TEA server with public reads and authenticated writes
+- Discovery, consumer, and partial publisher flows exercised end to end
+- Sigstore, SLSA, and evidence-oriented supply chain automation
+- Dagger-based CI and release tooling
+- Protobuf and JSON-schema based contract handling for runtime and tooling
 
 ## Artefacts available of the API
 
